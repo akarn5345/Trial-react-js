@@ -19,14 +19,29 @@ export default function App() {
     { id: "bank", title: "Bank PO", description: "Banking exams" }
   ];
 
-  // Load selected exam questions
+  // Function to shuffle array using Fisher-Yates algorithm
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Load selected exam questions with shuffling
   useEffect(() => {
     if (selectedExam) {
       let data = [];
       if (selectedExam === "upsc") data = upscData;
       else if (selectedExam === "ssc") data = sscData;
       else if (selectedExam === "bank") data = bankData;
-      setQuestions(data);
+      const shuffledData = shuffleArray([...data]); // Shuffle questions
+      const shuffledQuestions = shuffledData.map(q => ({
+        ...q,
+        options: shuffleArray([...q.options]) // Shuffle options
+      }));
+      setQuestions(shuffledQuestions);
       setAnswers({});
       setTimeLeft(600);
       setSubmitted(false);
